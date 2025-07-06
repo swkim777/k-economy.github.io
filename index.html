@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>2025 한국 경제 인터랙티브 대시보드</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Calm Harmony -->
+    <!-- Application Structure Plan: The application is designed as a single-page dashboard for intuitive, non-linear exploration. It starts with a hero section with headline stats for an immediate overview. A sticky navigation bar allows users to jump to four key thematic sections: 1) A 'Macroeconomic Dashboard' with core indicators (GDP, Inflation, Employment) in a grid layout for a quick snapshot. 2) A 'Key Drivers' section using a tabbed interface to detail the performance of core export industries (Semiconductors, Autos, Shipbuilding), allowing focused analysis. 3) A 'Structural Challenges' section using a card-based layout to clearly present long-term issues (Demographics, Debt, Global Risks). 4) A 'Policy Dilemma' section using a central visual metaphor (a seesaw) to explain the complex trade-off between economic stimulus and financial stability. This structure transforms the linear report into an engaging, user-driven experience, prioritizing clarity and ease of understanding over the original report's sequence. -->
+    <!-- Visualization & Content Choices: The application uses a mix of visualizations to achieve different goals, all without SVG or Mermaid. 1) Goal: Inform -> Method: Large stat cards in the hero and employment sections provide immediate, high-impact data. Interaction: Subtle hover effects. Justification: Quick delivery of key metrics. 2) Goal: Compare -> Method: Chart.js bar charts are used to compare GDP components and automotive sales (BEV vs. HEV). Interaction: Interactive tooltips and a button to toggle GDP data views (QoQ vs. YoY). Justification: Bar charts are ideal for direct comparison, and interactivity allows for deeper data exploration without clutter. 3) Goal: Change over Time -> Method: Chart.js line charts visualize trends in inflation, policy rates, and shipbuilding orders. Interaction: Tooltips on hover. Justification: Line charts are the standard for showing temporal data effectively. 4) Goal: Organize -> Method: A tabbed interface organizes industry analysis, and a grid/card layout structures challenges. Interaction: Smooth scrolling via navigation links. Justification: These patterns break down complex information into digestible, user-controlled segments. 5) Goal: Relationships -> Method: A seesaw diagram built with HTML/CSS visually represents the core policy dilemma. Justification: A simple visual metaphor is more effective than a complex chart for explaining this abstract, crucial concept. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+            background-color: #F8F7F4;
+            color: #4A4A4A;
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 280px;
+            max-height: 320px;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 320px;
+                max-height: 350px;
+            }
+        }
+        .nav-link {
+            transition: color 0.3s, border-bottom-color 0.3s;
+        }
+        .nav-link:hover, .nav-link.active {
+            color: #3B82F6;
+            border-bottom-color: #3B82F6;
+        }
+        .tab-button.active {
+            background-color: #3B82F6;
+            color: white;
+        }
+        .tab-button {
+            transition: background-color 0.3s, color 0.3s;
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <header id="header" class="bg-white/80 backdrop-blur-lg sticky top-0 z-50 shadow-sm">
+        <nav class="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex-shrink-0">
+                    <h1 class="text-xl font-bold text-gray-800">2025 한국 경제 리포트</h1>
+                </div>
+                <div class="hidden md:block">
+                    <div class="ml-10 flex items-baseline space-x-4">
+                        <a href="#dashboard" class="nav-link text-gray-600 hover:text-blue-500 px-3 py-2 rounded-md text-sm font-medium border-b-2 border-transparent">대시보드</a>
+                        <a href="#drivers" class="nav-link text-gray-600 hover:text-blue-500 px-3 py-2 rounded-md text-sm font-medium border-b-2 border-transparent">핵심 동력</a>
+                        <a href="#challenges" class="nav-link text-gray-600 hover:text-blue-500 px-3 py-2 rounded-md text-sm font-medium border-b-2 border-transparent">구조적 과제</a>
+                        <a href="#dilemma" class="nav-link text-gray-600 hover:text-blue-500 px-3 py-2 rounded-md text-sm font-medium border-b-2 border-transparent">정책 딜레마</a>
+                    </div>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <main class="container mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12">
+        <section class="text-center mb-12 md:mb-16">
+            <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">기로에 선 한국 경제: 이중 구조의 심화</h2>
+            <p class="max-w-3xl mx-auto text-gray-600 text-lg">2025년 한국 경제는 견고한 첨단 수출과 부채에 짓눌린 내수 시장의 양극화 속에서 복잡한 전환기를 맞고 있습니다.</p>
+            <div class="mt-8 grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto">
+                <div class="bg-white p-6 rounded-xl shadow-md transform hover:scale-105 transition-transform duration-300">
+                    <h3 class="text-sm font-semibold text-gray-500">2025년 1분기 GDP 성장률 (전기대비)</h3>
+                    <p class="text-3xl font-bold text-red-500 mt-2">-0.2%</p>
+                </div>
+                <div class="bg-white p-6 rounded-xl shadow-md transform hover:scale-105 transition-transform duration-300">
+                    <h3 class="text-sm font-semibold text-gray-500">기준 금리 (2025년 5월)</h3>
+                    <p class="text-3xl font-bold text-blue-500 mt-2">2.50%</p>
+                </div>
+                <div class="bg-white p-6 rounded-xl shadow-md transform hover:scale-105 transition-transform duration-300">
+                    <h3 class="text-sm font-semibold text-gray-500">가계부채 비율 (GDP 대비)</h3>
+                    <p class="text-3xl font-bold text-yellow-600 mt-2">90.1%</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="dashboard" class="py-12 md:py-16 scroll-mt-20">
+            <h2 class="text-2xl md:text-3xl font-bold text-center mb-2 text-gray-900">거시경제 대시보드</h2>
+            <p class="text-center text-gray-600 mb-10">한국 경제의 현주소를 보여주는 핵심 지표들을 통해 성장, 물가, 고용의 현황을 확인해 보세요.</p>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <div class="bg-white p-6 rounded-xl shadow-lg">
+                    <h3 class="text-lg font-semibold mb-1">성장률 궤적: 내수 침체와 역성장</h3>
+                    <p class="text-sm text-gray-500 mb-4">민간 소비와 투자가 급격히 위축되며 2025년 1분기 마이너스 성장을 기록했습니다.</p>
+                    <div class="flex justify-center mb-4">
+                        <button id="gdpToggleQoQ" class="px-4 py-2 text-xs font-semibold bg-blue-500 text-white rounded-l-md">전기대비</button>
+                        <button id="gdpToggleYoY" class="px-4 py-2 text-xs font-semibold bg-blue-100 text-blue-800 rounded-r-md">전년동기대비</button>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="gdpChart"></canvas>
+                    </div>
+                </div>
+                <div class="bg-white p-6 rounded-xl shadow-lg">
+                    <h3 class="text-lg font-semibold mb-1">물가 동향: 안정 속 체감 괴리</h3>
+                    <p class="text-sm text-gray-500 mb-4">소비자물가지수(CPI)는 안정세를 보이나, 생활비 부담은 여전히 높은 수준입니다.</p>
+                    <div class="chart-container h-80 md:h-96">
+                        <canvas id="inflationChart"></canvas>
+                    </div>
+                </div>
+                <div class="bg-white p-6 rounded-xl shadow-lg">
+                    <h3 class="text-lg font-semibold mb-1">고용 시장: 견고한 지표 이면의 긴장</h3>
+                    <p class="text-sm text-gray-500 mb-4">낮은 실업률에도 불구, 청년 실업과 구직 단념 인구는 구조적 문제를 시사합니다.</p>
+                     <div class="space-y-4 pt-8">
+                        <div class="flex justify-between items-baseline">
+                            <span class="font-medium text-gray-700">전체 실업률 (25년 5월)</span>
+                            <span class="text-2xl font-bold text-green-600">2.7%</span>
+                        </div>
+                        <div class="w-full bg-gray-200 rounded-full h-2.5"><div class="bg-green-500 h-2.5 rounded-full" style="width: 2.7%"></div></div>
+                        <div class="flex justify-between items-baseline">
+                            <span class="font-medium text-gray-700">청년(15-29세) 실업률</span>
+                            <span class="text-2xl font-bold text-yellow-500">6.6%</span>
+                        </div>
+                        <div class="w-full bg-gray-200 rounded-full h-2.5"><div class="bg-yellow-400 h-2.5 rounded-full" style="width: 6.6%"></div></div>
+                        <div class="flex justify-between items-baseline">
+                            <span class="font-medium text-gray-700">구직 단념 인구</span>
+                            <span class="text-2xl font-bold text-gray-500">34.5만명</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-white p-6 rounded-xl shadow-lg">
+                    <h3 class="text-lg font-semibold mb-1">경제의 이중 구조</h3>
+                    <p class="text-sm text-gray-500 mb-4">수출과 내수, 두 경제 축의 불균형이 심화되고 있습니다.</p>
+                    <div class="mt-6 space-y-4 text-gray-700">
+                        <div class="p-4 bg-blue-50 rounded-lg">
+                            <h4 class="font-bold text-blue-800">🚀 견고한 수출 부문</h4>
+                            <p class="text-sm mt-1">HBM 반도체, 하이브리드 자동차 등 첨단 기술 제품이 성장을 견인하며 글로벌 시장에서 기술 리더십을 증명하고 있습니다.</p>
+                        </div>
+                        <div class="p-4 bg-red-50 rounded-lg">
+                            <h4 class="font-bold text-red-800">🏠 취약한 내수 시장</h4>
+                            <p class="text-sm mt-1">높은 가계부채와 금리 부담으로 인해 민간소비와 투자가 위축되어 경기 회복의 발목을 잡는 핵심 요인으로 작용합니다.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="drivers" class="py-12 md:py-16 scroll-mt-20">
+            <h2 class="text-2xl md:text-3xl font-bold text-center mb-2 text-gray-900">핵심 동력: 수출 엔진 분석</h2>
+            <p class="text-center text-gray-600 mb-10">한국 경제의 성장을 이끄는 주요 산업들의 동향과 미래 전망을 심층적으로 분석합니다.</p>
+            <div>
+                <div class="mb-6 border-b border-gray-200">
+                    <div class="flex justify-center space-x-2 md:space-x-4" id="industryTabs">
+                        <button class="tab-button active text-sm md:text-base font-medium py-2 px-4 rounded-t-lg" data-tab="semiconductor">
+                            <span class="mr-2">️</span>반도체
+                        </button>
+                        <button class="tab-button text-gray-500 hover:text-gray-700 text-sm md:text-base font-medium py-2 px-4 rounded-t-lg" data-tab="automotive">
+                            <span class="mr-2"></span>자동차
+                        </button>
+                        <button class="tab-button text-gray-500 hover:text-gray-700 text-sm md:text-base font-medium py-2 px-4 rounded-t-lg" data-tab="shipbuilding">
+                            <span class="mr-2"></span>조선
+                        </button>
+                    </div>
+                </div>
+                <div id="tabContent" class="bg-white p-6 rounded-b-xl rounded-tr-xl shadow-lg">
+                    <!-- Tab content will be injected here by JS -->
+                </div>
+            </div>
+        </section>
+
+        <section id="challenges" class="py-12 md:py-16 scroll-mt-20">
+            <h2 class="text-2xl md:text-3xl font-bold text-center mb-2 text-gray-900">구조적 과제: 다가오는 역풍</h2>
+            <p class="text-center text-gray-600 mb-10">단기적 경기 문제를 넘어, 한국 경제의 미래를 위협하는 장기적이고 구조적인 도전 과제들을 살펴봅니다.</p>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div class="bg-white p-6 rounded-xl shadow-lg flex flex-col">
+                    <h3 class="text-lg font-bold text-center mb-4">인구 절벽</h3>
+                    <p class="text-sm text-gray-500 text-center mb-4 flex-grow">세계 최저 수준의 출산율과 빠른 고령화는 잠재성장률을 잠식하는 가장 근본적인 위협입니다.</p>
+                    <div class="text-center my-4">
+                        <p class="text-sm text-gray-500">잠재성장률 전망</p>
+                        <p class="text-3xl font-bold text-red-600">2050년 0%대</p>
+                    </div>
+                    <div class="chart-container h-48">
+                        <canvas id="populationChart"></canvas>
+                    </div>
+                </div>
+                <div class="bg-white p-6 rounded-xl shadow-lg flex flex-col">
+                    <h3 class="text-lg font-bold text-center mb-4">부채의 덫</h3>
+                    <p class="text-sm text-gray-500 text-center mb-4 flex-grow">GDP 대비 세계 최고 수준인 가계부채는 소비를 억제하고 금융 시스템의 잠재적 리스크로 작용합니다.</p>
+                    <div class="text-center my-4">
+                        <p class="text-sm text-gray-500">GDP 대비 가계부채 비율</p>
+                        <p class="text-3xl font-bold text-yellow-600">90.1%</p>
+                    </div>
+                     <div class="chart-container h-48">
+                        <canvas id="debtChart"></canvas>
+                    </div>
+                </div>
+                 <div class="bg-white p-6 rounded-xl shadow-lg flex flex-col">
+                    <h3 class="text-lg font-bold text-center mb-4">글로벌 리스크</h3>
+                    <p class="text-sm text-gray-500 text-center mb-4 flex-grow">미국의 보호무역주의, 중국의 경기 둔화 등 대외 환경의 불확실성은 수출 의존도가 높은 한국 경제에 큰 부담입니다.</p>
+                    <div class="mt-auto space-y-3 pt-4 text-sm">
+                        <div class="flex items-start"><span class="mr-2 mt-1 text-blue-500">▶</span><span><b>시장 다변화:</b> 중국 의존도를 낮추고 아세안, EU 등 신규 시장 개척으로 리스크 분산 중.</span></div>
+                        <div class="flex items-start"><span class="mr-2 mt-1 text-blue-500">▶</span><span><b>기술 리더십:</b> 초격차 기술을 통해 글로벌 공급망 내 핵심적 위치를 유지하는 것이 중요.</span></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="dilemma" class="py-12 md:py-16 scroll-mt-20">
+            <h2 class="text-2xl md:text-3xl font-bold text-center mb-2 text-gray-900">정책 딜레마: 위태로운 줄타기</h2>
+            <p class="text-center text-gray-600 mb-10">정책 당국은 경기 부양과 금융 안정이라는 상충하는 두 목표 사이에서 어려운 선택에 직면해 있습니다.</p>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
+                <div class="bg-white p-6 rounded-xl shadow-lg">
+                    <h3 class="text-lg font-semibold mb-4 text-center">한국은행의 통화정책 경로</h3>
+                    <div class="chart-container">
+                        <canvas id="policyRateChart"></canvas>
+                    </div>
+                </div>
+                <div class="bg-white p-6 rounded-xl shadow-lg">
+                    <h3 class="text-lg font-semibold mb-6 text-center">'가속 페달'과 '브레이크'의 동시 작동</h3>
+                    <div class="relative flex items-center justify-center my-8 h-24">
+                        <div class="w-full h-1 bg-gray-400 transform"></div>
+                        <div class="absolute w-full flex justify-between">
+                            <div class="flex flex-col items-center">
+                                <div class="p-4 bg-blue-100 text-blue-800 rounded-full mb-2">▼</div>
+                                <span class="font-bold">경기 부양</span>
+                                <span class="text-xs text-gray-500">(기준금리 인하)</span>
+                            </div>
+                            <div class="flex flex-col items-center">
+                                <div class="p-4 bg-red-100 text-red-800 rounded-full mb-2">▲</div>
+                                <span class="font-bold">금융 안정</span>
+                                <span class="text-xs text-gray-500">(부채 리스크)</span>
+                            </div>
+                        </div>
+                    </div>
+                    <p class="text-sm text-gray-600 mt-6">
+                        경기 부양을 위한 <span class="font-bold text-blue-600">금리 인하</span>는 필수적이지만, 동시에 가계부채를 자극하여 <span class="font-bold text-red-600">부동산 시장 과열과 금융 불안</span>을 초래할 수 있는 위험을 안고 있습니다. 이에 정부는 대출 규제(스트레스 DSR)를 유지하며 부채 증가를 억제하는 이중 전략을 사용하고 있습니다.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="bg-gray-800 text-white mt-16">
+        <div class="container mx-auto px-8 py-4 text-center text-sm">
+            <p>&copy; 2025 Interactive Economic Report. All Rights Reserved.</p>
+            <p class="text-gray-400 mt-1">본 데이터는 '2025년 한국 경제 현황 및 전망 분석 보고서'를 기반으로 제작되었습니다.</p>
+        </div>
+    </footer>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', function () {
+        Chart.defaults.font.family = "'Noto Sans KR', sans-serif";
+        Chart.defaults.plugins.tooltip.backgroundColor = 'rgba(0, 0, 0, 0.7)';
+        Chart.defaults.plugins.tooltip.titleFont = { size: 14, weight: 'bold' };
+        Chart.defaults.plugins.tooltip.bodyFont = { size: 12 };
+        Chart.defaults.plugins.tooltip.padding = 10;
+        Chart.defaults.plugins.tooltip.cornerRadius = 4;
+        
+        const gdpData = {
+            labels: ['2024 2분기', '2024 3분기', '2024 4분기', '2025 1분기'],
+            datasets: {
+                qoq: {
+                    label: '전기대비 성장률 (%)',
+                    data: [0.6, 0.4, 0.1, -0.2],
+                    backgroundColor: (context) => context.raw < 0 ? 'rgba(239, 68, 68, 0.6)' : 'rgba(59, 130, 246, 0.6)',
+                    borderColor: (context) => context.raw < 0 ? 'rgb(239, 68, 68)' : 'rgb(59, 130, 246)',
+                    borderWidth: 1
+                },
+                yoy: {
+                    label: '전년동기대비 성장률 (%)',
+                    data: [2.2, 1.8, 0.9, 0.1],
+                    backgroundColor: 'rgba(22, 163, 74, 0.6)',
+                    borderColor: 'rgb(22, 163, 74)',
+                    borderWidth: 1
+                }
+            }
+        };
+
+        const inflationData = {
+            labels: ['2024/12', '2025/01', '2025/02', '2025/03', '2025/04', '2025/05', '2025/06'],
+            datasets: [
+                {
+                    label: '소비자물가지수(CPI) 상승률',
+                    data: [2.5, 2.2, 2.0, 2.1, 2.3, 2.4, 2.2],
+                    borderColor: 'rgb(59, 130, 246)',
+                    backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                    fill: true,
+                    tension: 0.4
+                },
+                {
+                    label: '근원 인플레이션',
+                    data: [2.8, 2.6, 2.5, 2.4, 2.4, 2.4, 2.4],
+                    borderColor: 'rgb(234, 179, 8)',
+                    backgroundColor: 'rgba(234, 179, 8, 0.1)',
+                    fill: false,
+                    tension: 0.4,
+                    borderDash: [5, 5]
+                },
+                {
+                    label: '목표치',
+                    data: [2.0, 2.0, 2.0, 2.0, 2.0, 2.0, 2.0],
+                    borderColor: 'rgb(239, 68, 68)',
+                    fill: false,
+                    pointRadius: 0,
+                    borderWidth: 2
+                }
+            ]
+        };
+
+        const policyRateData = {
+            labels: ['2024/10', '2024/12', '2025/02', '2025/04', '2025/05'],
+            datasets: [{
+                label: '한국은행 기준금리 (%)',
+                data: [3.00, 3.00, 2.75, 2.75, 2.50],
+                borderColor: 'rgb(59, 130, 246)',
+                backgroundColor: 'rgba(59, 130, 246, 0.5)',
+                stepped: true
+            }]
+        };
+
+        const populationData = {
+            labels: ['2020', '2030', '2040', '2050'],
+            datasets: [{
+                label: '생산가능인구 (만 명)',
+                data: [3738, 3381, 2852, 2419],
+                backgroundColor: 'rgba(239, 68, 68, 0.6)',
+                borderColor: 'rgb(239, 68, 68)',
+                borderWidth: 1
+            }]
+        };
+        
+        const debtData = {
+            labels: ['2021', '2022', '2023', '2024'],
+            datasets: [{
+                label: 'GDP 대비 가계부채 비율 (%)',
+                data: [105.4, 104.5, 93.5, 90.1],
+                borderColor: 'rgb(217, 119, 6)',
+                backgroundColor: 'rgba(217, 119, 6, 0.1)',
+                fill: true,
+                tension: 0.1
+            }]
+        };
+        
+        const industryContent = {
+            semiconductor: {
+                title: '반도체: HBM 호황과 시장 양극화',
+                text: "AI 시장의 폭발적 성장에 힘입어 고대역폭 메모리(HBM) 수요가 급증하며 한국 반도체 수출을 견인하고 있습니다. 그러나 파운드리, 범용 D램 등 다른 분야는 부진을 겪으며 'HBM 쏠림' 현상이 뚜렷한 이중적 모습을 보입니다.",
+                chart: {
+                    type: 'bar',
+                    data: {
+                        labels: ['HBM 시장 성장률', '범용 D램 시장 성장률'],
+                        datasets: [{
+                            label: '2025년 전망 (%)',
+                            data: [40, 5],
+                            backgroundColor: ['rgba(59, 130, 246, 0.6)', 'rgba(203, 213, 225, 0.6)'],
+                            borderColor: ['rgb(59, 130, 246)', 'rgb(203, 213, 225)'],
+                            borderWidth: 1
+                        }]
+                    },
+                    options: { scales: { y: { beginAtZero: true, title: { display: true, text: '성장률 (%)' } } }, plugins: { legend: { display: false } } }
+                }
+            },
+            automotive: {
+                title: "자동차: EV 전환기 속 '하이브리드'의 약진",
+                text: "전기차(EV) 시장이 일시적 수요 둔화(캐즘)를 겪는 사이, 하이브리드차(HEV)가 높은 인기를 얻으며 현대·기아의 실적을 이끌고 있습니다. 이는 단기 수익과 장기 EV 전환 투자 사이의 전략적 딜레마를 안겨줍니다.",
+                chart: {
+                    type: 'bar',
+                    data: {
+                        labels: ['2024 상반기', '2025 상반기'],
+                        datasets: [
+                            { label: '하이브리드차', data: [11.2, 15.4], backgroundColor: 'rgba(22, 163, 74, 0.7)' },
+                            { label: '전기차(EV)', data: [3.8, 3.0], backgroundColor: 'rgba(59, 130, 246, 0.7)' }
+                        ]
+                    },
+                    options: { scales: { x: { stacked: true }, y: { stacked: true, beginAtZero: true, title: { display: true, text: '판매량 (만 대)' } } }, plugins: { legend: { position: 'top' } } }
+                }
+            },
+            shipbuilding: {
+                title: '조선: 고부가가치 선박으로 슈퍼 사이클 진입',
+                text: "친환경·고부가가치 선박인 LNG 운반선 등을 중심으로 3년 이상의 안정적인 일감을 확보하며 '슈퍼 사이클'에 진입했습니다. 글로벌 환경 규제 강화로 장기 전망도 밝아 호황이 지속될 가능성이 높습니다.",
+                chart: {
+                    type: 'line',
+                    data: {
+                        labels: ['2023 1분기', '2023 4분기', '2024 4분기', '2025 1분기'],
+                        datasets: [{
+                            label: '수주잔고',
+                            data: [150, 175, 180, 200],
+                            borderColor: 'rgb(59, 130, 246)',
+                            backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                            fill: true,
+                            tension: 0.1
+                        }]
+                    },
+                    options: { scales: { y: { beginAtZero: false, title: { display: true, text: '금액 (조 원)' } } }, plugins: { legend: { display: false } } }
+                }
+            }
+        };
+        
+        let gdpChart, inflationChart, policyRateChart, populationChart, debtChart, industryChart;
+
+        const gdpCtx = document.getElementById('gdpChart').getContext('2d');
+        gdpChart = new Chart(gdpCtx, {
+            type: 'bar',
+            data: { labels: gdpData.labels, datasets: [gdpData.datasets.qoq] },
+            options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true } } }
+        });
+
+        const inflationCtx = document.getElementById('inflationChart').getContext('2d');
+        inflationChart = new Chart(inflationCtx, {
+            type: 'line',
+            data: inflationData,
+            options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: false } } }
+        });
+        
+        const policyRateCtx = document.getElementById('policyRateChart').getContext('2d');
+        policyRateChart = new Chart(policyRateCtx, {
+            type: 'line',
+            data: policyRateData,
+            options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: false } } }
+        });
+
+        const populationCtx = document.getElementById('populationChart').getContext('2d');
+        populationChart = new Chart(populationCtx, {
+            type: 'bar',
+            data: populationData,
+            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
+        });
+        
+        const debtCtx = document.getElementById('debtChart').getContext('2d');
+        debtChart = new Chart(debtCtx, {
+            type: 'line',
+            data: debtData,
+            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
+        });
+
+        document.getElementById('gdpToggleQoQ').addEventListener('click', () => {
+            gdpChart.data.datasets[0] = gdpData.datasets.qoq;
+            gdpChart.update();
+            document.getElementById('gdpToggleQoQ').classList.replace('bg-blue-100', 'bg-blue-500');
+            document.getElementById('gdpToggleQoQ').classList.replace('text-blue-800', 'text-white');
+            document.getElementById('gdpToggleYoY').classList.replace('bg-blue-500', 'bg-blue-100');
+            document.getElementById('gdpToggleYoY').classList.replace('text-white', 'text-blue-800');
+        });
+
+        document.getElementById('gdpToggleYoY').addEventListener('click', () => {
+            gdpChart.data.datasets[0] = gdpData.datasets.yoy;
+            gdpChart.update();
+            document.getElementById('gdpToggleYoY').classList.replace('bg-blue-100', 'bg-blue-500');
+            document.getElementById('gdpToggleYoY').classList.replace('text-blue-800', 'text-white');
+            document.getElementById('gdpToggleQoQ').classList.replace('bg-blue-500', 'bg-blue-100');
+            document.getElementById('gdpToggleQoQ').classList.replace('text-white', 'text-blue-800');
+        });
+
+        const tabs = document.getElementById('industryTabs');
+        const tabContentContainer = document.getElementById('tabContent');
+
+        function updateTabContent(tabId) {
+            const content = industryContent[tabId];
+            if (!content) return;
+            
+            tabContentContainer.innerHTML = `
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+                    <div>
+                        <h3 class="text-lg font-bold mb-2">${content.title}</h3>
+                        <p class="text-sm text-gray-600">${content.text}</p>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="industryChartCanvas"></canvas>
+                    </div>
+                </div>
+            `;
+
+            if (industryChart) {
+                industryChart.destroy();
+            }
+            const industryCtx = document.getElementById('industryChartCanvas').getContext('2d');
+            industryChart = new Chart(industryCtx, {
+                type: content.chart.type,
+                data: content.chart.data,
+                options: { ...content.chart.options, responsive: true, maintainAspectRatio: false }
+            });
+        }
+
+        tabs.addEventListener('click', (e) => {
+            const button = e.target.closest('button');
+            if (!button) return;
+            
+            const tabId = button.dataset.tab;
+            if (tabId) {
+                tabs.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
+                button.classList.add('active');
+                updateTabContent(tabId);
+            }
+        });
+
+        updateTabContent('semiconductor');
+
+        const navLinks = document.querySelectorAll('.nav-link');
+        const sections = document.querySelectorAll('section[id]');
+        
+        window.addEventListener('scroll', () => {
+            let current = '';
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop;
+                if (pageYOffset >= sectionTop - 80) {
+                    current = section.getAttribute('id');
+                }
+            });
+
+            navLinks.forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('href').substring(1) === current) {
+                    link.classList.add('active');
+                }
+            });
+        });
+        
+        navLinks.forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+
+    });
+    </script>
+</body>
+</html>
